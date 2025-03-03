@@ -4,8 +4,7 @@ const Database = require("better-sqlite3");
 const bcrypt = require("bcrypt");
 
 // Initialize database
-const dbPath = path.join(__dirname, "database.sqlite");
-const db = new Database(dbPath);
+const db = new Database("database.db", { verbose: console.log });
 
 function initDatabase() {
   // Create users table if it doesn't exist
