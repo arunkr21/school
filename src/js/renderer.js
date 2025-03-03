@@ -8,11 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
     loginButton.addEventListener("click", async () => {
       const username = usernameInput.value;
       const password = passwordInput.value;
+      alert(username);
+      alert(password);
+      alert("hello");
 
       if (username && password) {
-        const role = await window.electronAPI.loginUser(username, password);
+        const role = await window.electronAPI.login(username, password);
         if (role === "admin") {
-          window.location.href = "admin.html";
+          window.location.href = "admin/students.html";
         } else if (role === "staff") {
           window.location.href = "staff.html";
         } else {

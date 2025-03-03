@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoutButton) {
     logoutButton.addEventListener("click", () => {
       // Redirect to login page
-      window.location.href = "login.html";
+      window.location.href = "index.html";
     });
   }
 });

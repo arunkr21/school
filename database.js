@@ -3,16 +3,6 @@ const bcrypt = require("bcrypt");
 
 const db = new sqlite3.Database("./database.sqlite");
 
-// Create tables if they don't exist
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY, 
-        username TEXT UNIQUE, 
-        password TEXT, 
-        role TEXT CHECK(role IN ('admin', 'staff'))
-    )`);
-});
-
 // Function to insert a user (Admin or Staff)
 async function insertUser(username, password, role) {
   const hashedPassword = await bcrypt.hash(password, 10);
