@@ -1,64 +1,14 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
-const Database = require("better-sqlite3");
 const bcrypt = require("bcrypt");
-
-// Initialize database
-const db = new Database("database.db", { verbose: console.log });
-
-function initDatabase() {
-  // Create users table if it doesn't exist
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      name TEXT NOT NULL,
-      role TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `
-  ).run();
-
-  // Create students table if it doesn't exist
-  const aaa = db
-    .prepare(
-      `
-    CREATE TABLE IF NOT EXISTS students (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      admission_number TEXT UNIQUE NOT NULL,
-      name TEXT NOT NULL,
-      date_of_birth TEXT NOT NULL,
-      added_by INTEGER,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (added_by) REFERENCES users (id)
-    )
-  `
-    )
-    .run();
-
-  // Check if admin user exists, if not create default admin
-  const adminExists = db
-    .prepare("SELECT id FROM users WHERE role = 'admin' LIMIT 1")
-    .get();
-
-  if (!adminExists) {
-    const hashedPassword = bcrypt.hashSync("admin123", 10);
-    db.prepare(
-      "INSERT INTO users (username, password, name, role) VALUES (?, ?, ?, ?)"
-    ).run("admin", hashedPassword, "Administrator", "admin");
-    console.log("Default admin user created");
-  }
-
-  console.log("Database initialized");
-}
+const Database = require("./database.js");
 
 let mainWindow;
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 600,
-    height: 400,
+    // fullscreen: true,
+    width: 800,
+    height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
@@ -67,10 +17,14 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, "src", "pages", "login.html"));
+
+  mainWindow.webContents.once("did-finish-load", () => {
+    mainWindow.webContents.setZoomFactor(0.9); // 90% zoom
+  });
 }
 
 app.whenReady().then(() => {
-  initDatabase();
+  Database.initDatabase();
   createWindow();
 });
 
@@ -83,30 +37,7 @@ app.on("window-all-closed", () => {
 // Authentication
 ipcMain.handle("login", async (_, username, password) => {
   try {
-    const user = db
-      .prepare("SELECT * FROM users WHERE username = ?")
-      .get(username);
-    console.log("----", user);
-    if (!user) {
-      return { success: false, message: "User not found" };
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return { success: false, message: "Invalid password" };
-    }
-
-    // return user.role;
-    return {
-      success: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        name: user.name,
-        role: user.role,
-      },
-    };
+    return Database.authenticateUser(username, password);
   } catch (error) {
     console.error("Login error:", error);
     return { success: false, message: "An error occurred" };
