@@ -22,41 +22,46 @@ function initDatabase() {
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS students (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      admission_number TEXT NOT NULL UNIQUE,
+      admission_no INTEGER PRIMARY KEY,
       name TEXT NOT NULL,
       address TEXT,
       date_of_birth TEXT,
       date_of_admission TEXT,
-      class INTEGER CHECK (class BETWEEN 1 AND 10),
-      aadhar_number TEXT,
-      is_cwsn INTEGER DEFAULT 0, -- Boolean (0 or 1)
-      parent_name TEXT,
-      parent_contact TEXT,
-      is_hostler INTEGER DEFAULT 0, -- Boolean (0 or 1)
+      class TEXT,
+      aadhar_no TEXT,
+      is_cwsn TEXT CHECK(is_cwsn IN ('Yes', 'No')),
+      father_name TEXT,
+      father_contact TEXT,
+      mother_name TEXT,
+      mother_contact TEXT,
+      is_hostler TEXT CHECK(is_hostler IN ('Yes', 'No')),
       guardian_name TEXT,
       guardian_address TEXT,
       guardian_contact TEXT,
+      alternate_contact TEXT,
       email TEXT,
       identification_marks TEXT,
       
-      bank_name TEXT,
-      bank_branch TEXT,
-      bank_ifsc TEXT,
-      bank_account TEXT,
 
-      religion TEXT,
-      caste TEXT,
+      bank_name TEXT,
+      branch_name TEXT,
+      ifsc_code TEXT,
+      account_no TEXT,
+
+      religion_caste TEXT,
       category TEXT,
-      parent_qualification TEXT,
-      parent_occupation TEXT,
-      annual_income REAL,
-    
+      father_qualification TEXT,
+      father_occupation TEXT,
+      mother_qualification TEXT,
+      mother_occupation TEXT,
+      annual_income INTEGER,
+
+      height INTEGER,
+      weight INTEGER,
       blood_group TEXT,
-      height REAL,
-      weight REAL,
-      special_disease TEXT,
+      special_diseases TEXT,
       vaccination_details TEXT,
+      
       
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -74,7 +79,7 @@ function initDatabase() {
       relationship TEXT,
       qualification TEXT,
       occupation TEXT,
-      FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
+      FOREIGN KEY (student_id) REFERENCES students (admission_no) ON DELETE CASCADE
     )
   `
   ).run();
@@ -88,7 +93,7 @@ function initDatabase() {
       type TEXT, -- hobby, achievement, scholarship, etc.
       description TEXT,
       year INTEGER,
-      FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
+      FOREIGN KEY (student_id) REFERENCES students (admission_no) ON DELETE CASCADE
     )
   `
   ).run();
@@ -116,7 +121,7 @@ function initDatabase() {
       ce_mark REAL, -- Continuous Evaluation mark
       te_mark REAL, -- Term Examination mark
       grade TEXT,
-      FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE,
+      FOREIGN KEY (student_id) REFERENCES students (admission_no) ON DELETE CASCADE,
       FOREIGN KEY (subject_id) REFERENCES subjects (id),
       UNIQUE(student_id, subject_id, term)
     )
@@ -245,3 +250,39 @@ async function authenticateUser(username, password) {
 }
 
 module.exports = { initDatabase, insertUser, authenticateUser };
+
+// id INTEGER PRIMARY KEY AUTOINCREMENT,
+//       admission_number TEXT NOT NULL UNIQUE,
+//       name TEXT NOT NULL,
+//       address TEXT,
+//       date_of_birth TEXT,
+//       date_of_admission TEXT,
+//       class INTEGER CHECK (class BETWEEN 1 AND 10),
+//       aadhar_number TEXT,
+//       is_cwsn INTEGER DEFAULT 0, -- Boolean (0 or 1)
+//       parent_name TEXT,
+//       parent_contact TEXT,
+//       is_hostler INTEGER DEFAULT 0, -- Boolean (0 or 1)
+//       guardian_name TEXT,
+//       guardian_address TEXT,
+//       guardian_contact TEXT,
+//       email TEXT,
+//       identification_marks TEXT,
+
+//       bank_name TEXT,
+//       bank_branch TEXT,
+//       bank_ifsc TEXT,
+//       bank_account TEXT,
+
+//       religion TEXT,
+//       caste TEXT,
+//       category TEXT,
+//       parent_qualification TEXT,
+//       parent_occupation TEXT,
+//       annual_income REAL,
+
+//       blood_group TEXT,
+//       height REAL,
+//       weight REAL,
+//       special_disease TEXT,
+//       vaccination_details TEXT,
