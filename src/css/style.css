@@ -104,7 +104,23 @@ body {
 
 body .container {
     display: flex;
+    flex-direction: column; /* Ensure the layout is column-based for records.html */
 }
+
+.student-data-list {
+    margin-top: 20px; /* Add margin for spacing */
+}
+
+.student-data-list h3 {
+    margin: 0; /* Remove default margin for headings */
+    font-weight: 500; /* Ensure consistent font weight */
+}
+
+.student-data-list p {
+    margin: 5px 0 15px 0; /* Add spacing between data items */
+    font-size: var(--font-size-md); /* Ensure consistent font size */
+}
+
 
 /* ************************************** */
 /* Login page  */
@@ -188,7 +204,9 @@ body .container {
 /* sidebar */
 /* ************************************** */
 .sidebar {
-    width: 250px;
+    width: 250px; 
+    /* Additional styles can be added here if needed */
+
     background-color: var(--dark-color);
     color: var(--text-light);
     padding: 1.5rem 0;
@@ -260,6 +278,12 @@ body .container {
     color: var(--dark-color);
 }
 
+.container .search-area{
+    display: flex;
+    margin-bottom: 20px;
+    align-items: center;
+    gap: 10px;
+}
 
 /* ************************************** */
 /* Form Styles */

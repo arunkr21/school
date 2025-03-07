@@ -47,9 +47,33 @@ ipcMain.handle("login", async (_, username, password) => {
   }
 });
 
-// Insert student into the database
-ipcMain.handle("insertStudent", (event, studentData) => {
-  const stmt = db.prepare(
+// Handle searching for a student
+ipcMain.handle("searchStudent", async (event, admissionNo) => {
+  try {
+    // Fetch student data
+    const stmt = db.prepare("SELECT * FROM students WHERE admission_no = ?");
+    const student = stmt.get(admissionNo); // Synchronous execution
+
+    // Fetch family members associated with the student
+    const familyStmt = db.prepare(
+      "SELECT * FROM family_members WHERE student_id = ?"
+    );
+    const familyMembers = familyStmt.all(admissionNo); // Fetch all family members
+
+    if (student) {
+      return { success: true, data: student, family: familyMembers };
+    } else {
+      return { success: false, message: "Student not found." };
+    }
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw error;
+  }
+});
+
+// Handle adding a student
+ipcMain.handle("insertStudent", (event, studentData, familyMembers) => {
+  const studentStmt = db.prepare(
     `
     INSERT INTO students (
       admission_no, name, address, date_of_birth, date_of_admission, class, aadhar_no, is_cwsn,  father_name, father_contact, mother_name, mother_contact, is_hostler,  guardian_name, guardian_address, guardian_contact, alternate_contact, email, identification_marks,
@@ -64,10 +88,97 @@ ipcMain.handle("insertStudent", (event, studentData) => {
     )
   `
   );
+  const updateStudent = db.prepare(
+    `
+    UPDATE students SET
+      name = @name, address =  @address, date_of_birth = @dob, date_of_admission = @doa, class = @class, aadhar_no = @aadhar, is_cwsn = @cwsn,  father_name = @father, father_contact = @contact_father, mother_name = @mother, mother_contact = @contact_mother, is_hostler = @hostler,  guardian_name = @guardian, guardian_address = @guardian_address, guardian_contact = @guardian_contact, alternate_contact = @alternate_no, email = @email, identification_marks = @id_marks,
+      bank_name = @bank_name, branch_name = @branch_name, ifsc_code = @ifsc, account_no = @account_no,
+      religion_caste = @religion, category = @category, father_qualification = @father_qualification, father_occupation = @father_occupation, mother_qualification = @mother_qualification, mother_occupation = @mother_occupation, annual_income = @annual_income,
+      height =  @height, weight =  @weight, blood_group = @blood_group, special_diseases = @special_diseases, vaccination_details = @vaccination_details
+     WHERE admission_no = @admission_no
+  `
+  );
+
   try {
-    stmt.run(studentData);
-    return { success: true, message: "Student added successfully!" };
+    // Check if the student already exists
+    const checkStmt = db.prepare(
+      "SELECT * FROM students WHERE admission_no = ?"
+    );
+    const existingStudent = checkStmt.get(studentData.admission_no);
+
+    if (existingStudent) {
+      // If student exists, update the record
+      updateStudent.run(studentData);
+
+      //Update family members
+      db.prepare("DELETE FROM family_members WHERE student_id = ?").run(
+        studentData.admission_no
+      ); // Remove old records
+
+      const insertFamilyStmt = db.prepare(`
+        INSERT INTO family_members (student_id, name, relationship, qualification, occupation) 
+        VALUES (?, ?, ?, ?, ?)
+    `);
+      const insertFamilyTransaction = db.transaction((familyMembers) => {
+        familyMembers.forEach((member) => {
+          insertFamilyStmt.run(
+            studentData.admission_no,
+            member.name,
+            member.relationship,
+            member.qualification,
+            member.occupation
+          );
+        });
+      });
+
+      insertFamilyTransaction(familyMembers);
+
+      // const familyStmt = db.prepare(`
+      //   UPDATE family_members SET  name = ?, relationship = ?, qualification = ?, occupation = ?
+
+      //   WHERE student_id = ?
+      // `);
+      // const updateMany = db.transaction((members) => {
+      //   for (const member of members) {
+      //     familyStmt.run(
+      //       member.name,
+      //       member.relationship,
+      //       member.qualification,
+      //       member.occupation,
+      //       studentData.admission_no
+      //     );
+      //   }
+      // });
+      // updateMany(familyMembers);
+
+      return { success: true, message: "Student record updated successfully." };
+    } else {
+      // If student does not exist, insert a new record
+      studentStmt.run(studentData);
+
+      //Insert family members
+      const familyStmt = db.prepare(`
+      INSERT INTO family_members (student_id, name, relationship, qualification, occupation) 
+      VALUES (?, ?, ?, ?, ?)
+    `);
+      const insertMany = db.transaction((members) => {
+        for (const member of members) {
+          familyStmt.run(
+            studentData.admission_no,
+            member.name,
+            member.relationship,
+            member.qualification,
+            member.occupation
+          );
+        }
+      });
+      insertMany(familyMembers);
+
+      return { success: true, message: "Student added successfully!" };
+    }
   } catch (error) {
+    console.error("------err"); //xxxxxxxxxxxxxxxxxxxxxxxxx
+    console.error(error); //xxxxxxxxxxxxxxxxxxxxxxxxx
     return { success: false, message: "Error: " + error.message };
   }
 });
