@@ -7,4 +7,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("insertStudent", studentData, familyMembers),
   searchStudent: (admissionNo) =>
     ipcRenderer.invoke("searchStudent", admissionNo),
+  addStaff: (staffData) => ipcRenderer.invoke("add-staff", staffData),
+  getAllStaff: () => ipcRenderer.invoke("get-all-staff"),
 });

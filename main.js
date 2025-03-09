@@ -182,3 +182,46 @@ ipcMain.handle("insertStudent", (event, studentData, familyMembers) => {
     return { success: false, message: "Error: " + error.message };
   }
 });
+
+// Add a new staff user
+ipcMain.handle("add-staff", async (event, staffData) => {
+  try {
+    const { username, password, assignedClass } = staffData;
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Check if staff already exists
+    const checkStmt = db.prepare("SELECT * FROM users WHERE username = ?");
+    const existingUser = checkStmt.get(username);
+
+    if (existingUser) {
+      return { success: false, message: "Staff username already exists." };
+    }
+
+    // Insert new staff user
+    const insertStmt = db.prepare(`
+          INSERT INTO users (username, password, role, assigned_class) 
+          VALUES (?, ?, 'staff', ?)
+      `);
+    insertStmt.run(username, hashedPassword, assignedClass);
+
+    return { success: true, message: "Staff added successfully." };
+  } catch (error) {
+    console.error("Database Error:", error);
+    return { success: false, message: "Database operation failed." };
+  }
+});
+
+// Get all staff users
+ipcMain.handle("get-all-staff", async () => {
+  try {
+    const stmt = db.prepare(
+      "SELECT username, assigned_class FROM users WHERE role = 'staff'"
+    );
+    return stmt.all(); // Return all staff users
+  } catch (error) {
+    console.error("Database Error:", error);
+    return [];
+  }
+});

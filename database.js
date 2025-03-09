@@ -13,6 +13,7 @@ function initDatabase() {
       username TEXT NOT NULL UNIQUE,
       password TEXT NOT NULL,
       role TEXT NOT NULL CHECK (role IN ('admin', 'staff')),
+      assigned_class TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `

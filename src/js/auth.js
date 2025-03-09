@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (result.user.role === "admin") {
               window.location.href = "../pages/admin/students.html";
             } else {
-              window.location.href = "../pages/staff/students.html";
+              window.location.href = "../pages/staff/staff.html";
             }
           } else {
             errorMessage.textContent = result.message;
