@@ -5,8 +5,179 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Management</title>
     <link rel="stylesheet" href="../../css/style.css">
-    <script defer src="../../js/staff.js"></script>
+    <!-- <script defer src="../../js/staff.js"></script> -->
     <script src="../../js/logout.js"></script>
+    <script src="../../js/academics.js"></script>
+    <!-- <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background-color: #60B5FF;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .school-name {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .section-title {
+            background-color: #60B5FF;
+            color: white;
+            padding: 10px 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .section-content {
+            padding: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f0f8ff;
+            color: #333;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        td {
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .remarks-container {
+            margin-top: 15px;
+        }
+        
+        .remarks-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #60B5FF;
+        }
+        
+        .remarks-item {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .remarks-label {
+            width: 120px;
+            font-weight: 600;
+        }
+        
+        .remarks-value {
+            flex: 1;
+            border-bottom: 1px dashed #ddd;
+            padding: 3px 0;
+            min-height: 24px;
+        }
+        
+        .achievements-content {
+            padding: 15px;
+        }
+        
+        .achievement-item {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .achievement-label {
+            width: 150px;
+            font-weight: 600;
+        }
+        
+        .achievement-value {
+            flex: 1;
+            border-bottom: 1px dashed #ddd;
+            padding: 3px 0;
+            min-height: 24px;
+        }
+        
+        .editable {
+            outline: none;
+        }
+        
+        .editable:focus {
+            border-bottom: 1px solid #60B5FF;
+            background-color: #f0f8ff;
+        }
+        
+        .save-btn {
+            background-color: #60B5FF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .save-btn:hover {
+            background-color: #4a91cc;
+        }
+        
+        .edit-instructions {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 20px;
+            background-color: #f0f8ff;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #60B5FF;
+        }
+        
+
+    </style> -->
 </head>
 <body>
     <header class="main-header">
@@ -28,8 +199,228 @@
                 </ul>
             </nav>
         </aside>
-        <main class="content">
-            hello
+        <main class="content academics">
+            <div class="content-header">
+                <h1>ACADEMICS AND ACHIEVEMENTS</h1>
+            </div>
+            <div class="search-area">
+                <input type="text" id="searchAdmissionNo" placeholder="Admission No">
+                <button id="searchStudentBtn">Search</button>
+            </div>
+
+            <section class="container">
+
+                <div class="section">
+                    <div class="student-info" id="student-details">
+                        <div class="student-info-item">
+                            <div class="student-info-label">Student Name:</div>
+                            <div class="student-info-value" id="student-name">Not selected</div>
+                        </div>
+                        <div class="student-info-item">
+                            <div class="student-info-label">Student ID:</div>
+                            <div class="student-info-value" id="student-id"></div>
+                        </div>
+                        <div class="student-info-item">
+                            <div class="student-info-label">Class:</div>
+                            <div class="student-info-value" id="student-class"></div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="section-title">CLASS X ACADEMIC DETAILS</div> -->
+                    <div class="section-content">
+                        <table id="subjectTable">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">SUBJECT</th>
+                                    <th colspan="2">TERM I</th>
+                                    <th colspan="2">TERM II</th>
+                                    <th colspan="2">TERM III</th>
+                                </tr>
+                                <tr>
+                                    <th>CE</th>
+                                    <th>TE</th>
+                                    <th>CE</th>
+                                    <th>TE</th>
+                                    <th>CE</th>
+                                    <th>TE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- <tr>
+                                    <td>Malayalam I</td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                </tr>
+                                <tr>
+                                    <td>Malayalam II</td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                </tr>
+                                <tr>
+                                    <td>English</td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                </tr>
+                                <tr>
+                                    <td>Hindi</td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                </tr>
+                                <tr>
+                                    <td>Physics</td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                </tr>
+                                <tr>
+                                    <td>Chemistry</td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                </tr>
+                                <tr>
+                                    <td>Biology</td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                </tr>
+                                <tr>
+                                    <td>Social Science</td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                </tr>
+                                <tr>
+                                    <td>Mathematics</td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                </tr>
+                                <tr>
+                                    <td>Art</td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                    <td contenteditable="true" class="editable"></td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                        
+                        <div class="remarks-container" id="remarks-container">
+                            <div class="remarks-title" id="remarks-title"></div>
+                            <div class="remarksContainer" id="remarksContainer"></div>
+                            <!-- <button id="saveRemarks">Save Remarks</button> -->
+                            
+                            <!-- <div class="remarks-item-list" id="remarks-item-list"> -->
+                                <!-- <div class="remarks-item">
+                                    <div class="remarks-label">Malayalam :</div>
+                                    <div class="remarks-value" contenteditable="true">GOOD</div>
+                                </div>
+                                
+                                <div class="remarks-item">
+                                    <div class="remarks-label">English :</div>
+                                    <div class="remarks-value" contenteditable="true">Average</div>
+                                </div>
+                                
+                                <div class="remarks-item">
+                                    <div class="remarks-label">Hindi :</div>
+                                    <div class="remarks-value" contenteditable="true"></div>
+                                </div>
+                                
+                                <div class="remarks-item">
+                                    <div class="remarks-label">Mathematics :</div>
+                                    <div class="remarks-value" contenteditable="true">Average</div>
+                                </div>
+                                
+                                <div class="remarks-item">
+                                    <div class="remarks-label">Basic Science :</div>
+                                    <div class="remarks-value" contenteditable="true"></div>
+                                </div>
+                                
+                                <div class="remarks-item">
+                                    <div class="remarks-label">Social Science :</div>
+                                    <div class="remarks-value" contenteditable="true"></div>
+                                </div>
+                                
+                                <div class="remarks-item">
+                                    <div class="remarks-label">Art :</div>
+                                    <div class="remarks-value" contenteditable="true"></div>
+                                </div> -->
+                            <!-- </div> -->
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="section">
+                    <div class="section-title">ACHIEVEMENTS & AREAS OF INTEREST</div>
+                    <div class="achievements-content">
+                        <div class="achievement-item">
+                            <div class="achievement-label">Hobby :</div>
+                            <input type="text" class="achievement-value" id="hobby">
+                            <!-- <div class="achievement-value" contenteditable="true"></div> -->
+                        </div>
+                        
+                        <div class="achievement-item">
+                            <div class="achievement-label">Special Abilities :</div>
+                            <input type="text" class="achievement-value" id="specialAbilities">
+                            <!-- <div class="achievement-value" contenteditable="true"></div> -->
+                        </div>
+                        
+                        <div class="achievement-item">
+                            <div class="achievement-label">Achievements :</div>
+                            <input type="text" class="achievement-value" id="achievements">
+                            <!-- <div class="achievement-value" contenteditable="true"></div> -->
+                        </div>
+                        
+                        <div class="achievement-item">
+                            <div class="achievement-label">Scholarships :</div>
+                            <input type="text" class="achievement-value" id="scholarships">
+                            <!-- <div class="achievement-value" contenteditable="true"></div> -->
+                        </div>
+                        
+                        <div class="achievement-item">
+                            <div class="achievement-label">Additional Notes :</div>
+                            <input type="text" class="achievement-value" id="additionalNotes">
+                            <!-- <div class="achievement-value" contenteditable="true"></div> -->
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="save-btn" class="save-btn">Save Record</button>
+            </section>
         </main>
 
     </div>

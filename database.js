@@ -86,16 +86,44 @@ function initDatabase() {
   ).run();
 
   // Achievements and interests table
+  // db.prepare(
+  //   `
+  //   CREATE TABLE IF NOT EXISTS achievements (
+  //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+  //     student_id INTEGER,
+  //     type TEXT, -- hobby, achievement, scholarship, etc.
+  //     description TEXT,
+  //     year INTEGER,
+  //     FOREIGN KEY (student_id) REFERENCES students (admission_no) ON DELETE CASCADE
+  //   )
+  // `
+  // ).run();
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS achievements (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      student_id INTEGER,
-      type TEXT, -- hobby, achievement, scholarship, etc.
-      description TEXT,
-      year INTEGER,
-      FOREIGN KEY (student_id) REFERENCES students (admission_no) ON DELETE CASCADE
+      student_id INTEGER UNIQUE, 
+      hobby TEXT,
+      special_abilities TEXT,
+      achievements TEXT,
+      scholarships TEXT,
+      additional_notes TEXT,
+      FOREIGN KEY (student_id) REFERENCES students(admission_no)
     )
+  `
+  ).run();
+
+  // Student Remark
+  db.prepare(
+    `
+    CREATE TABLE IF NOT EXISTS student_remarks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER,
+    subject TEXT,
+    remark TEXT,
+    UNIQUE(student_id, subject),
+    FOREIGN KEY (student_id) REFERENCES students(admission_no)
+  )
   `
   ).run();
 

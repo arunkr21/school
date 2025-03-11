@@ -9,8 +9,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     staffUsers.forEach((staff) => {
       const row = document.createElement("tr");
-      row.innerHTML = `<td>${staff.username}</td><td>${staff.assigned_class}</td>`;
+      row.innerHTML = `
+      <td>${staff.username}</td>
+      <td>${staff.assigned_class}</td>
+      <td><button class="deleteStaffBtn" data-username="${staff.username}">Delete</button></td>
+      `;
       staffList.appendChild(row);
+    });
+
+    // Attach delete event to each button
+    document.querySelectorAll(".deleteStaffBtn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const username = btn.getAttribute("data-username");
+        if (confirm(`Are you sure you want to delete ${username}?`)) {
+          const result = await window.electronAPI.deleteStaff(username);
+          alert(result.message);
+          loadStaffList(); // Refresh staff list
+        }
+      });
     });
   }
 

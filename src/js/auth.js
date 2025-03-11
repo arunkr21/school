@@ -16,7 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (result.user.role === "admin") {
               window.location.href = "../pages/admin/students.html";
             } else {
-              window.location.href = "../pages/staff/staff.html";
+              localStorage.setItem("loggedInUser", JSON.stringify(result.user));
+              window.location.href = "../pages/staff/records.html";
             }
           } else {
             errorMessage.textContent = result.message;

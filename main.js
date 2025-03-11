@@ -19,7 +19,9 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile(path.join(__dirname, "src", "pages", "login.html"));
+  mainWindow.loadFile(
+    path.join(__dirname, "src", "pages", "admin", "students.html")
+  );
 
   mainWindow.webContents.once("did-finish-load", () => {
     mainWindow.webContents.setZoomFactor(0.9); // 90% zoom
@@ -223,5 +225,161 @@ ipcMain.handle("get-all-staff", async () => {
   } catch (error) {
     console.error("Database Error:", error);
     return [];
+  }
+});
+
+// Delete a staff user
+ipcMain.handle("delete-staff", async (event, username) => {
+  try {
+    // Check if staff exists
+    const checkStmt = db.prepare("SELECT * FROM users WHERE username = ?");
+    const existingUser = checkStmt.get(username);
+
+    if (!existingUser) {
+      return { success: false, message: "Staff user not found." };
+    }
+
+    // Delete staff user
+    const deleteStmt = db.prepare("DELETE FROM users WHERE username = ?");
+    deleteStmt.run(username);
+
+    return { success: true, message: "Staff user deleted successfully." };
+  } catch (error) {
+    console.error("Database Error:", error);
+    return { success: false, message: "Database operation failed." };
+  }
+});
+
+// Get marks by class
+ipcMain.handle("getMarksByClass", async (event, className) => {
+  try {
+    const stmt = db.prepare(`
+      SELECT name FROM subjects WHERE standard = ?
+    `);
+    const marks = stmt.all(className); // Fetch marks for the specified class
+
+    return { success: true, data: marks };
+  } catch (error) {
+    console.error("Database Error:", error);
+    return { success: false, message: "Failed to retrieve marks." };
+  }
+});
+
+// Get all students
+ipcMain.handle("get-all-students", async () => {
+  try {
+    const stmt = db.prepare("SELECT * FROM students");
+    const students = stmt.all(); // Fetch all students
+    console.log(students);
+    return { success: true, data: students };
+  } catch (error) {
+    console.error("Database Error:", error);
+    return { success: false, message: "Failed to retrieve students." };
+  }
+});
+
+// Fetch student marks
+ipcMain.handle("get-student-marks", (event, studentId) => {
+  try {
+    const stmt = db.prepare("SELECT * FROM student_marks WHERE student_id = ?");
+    return stmt.all(studentId);
+  } catch (error) {
+    return error;
+  }
+});
+
+// Fetch subjects for assigned class
+ipcMain.handle("get-subjects", (event, assignedClass) => {
+  try {
+    const stmt = db.prepare("SELECT * FROM subjects WHERE standard = ?");
+    const result = stmt.all(assignedClass);
+    console.log(result);
+    return result;
+  } catch (error) {
+    console.log("ajihs");
+    return error;
+  }
+});
+
+// Save or update marks
+ipcMain.handle("save-marks", (event, marksData) => {
+  const stmt = db.prepare(`
+      INSERT INTO student_marks (student_id, subject_id, term, ce_mark, te_mark, grade)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT(student_id, subject_id, term) DO UPDATE SET 
+          ce_mark = excluded.ce_mark,
+          te_mark = excluded.te_mark,
+          grade = excluded.grade
+  `);
+  marksData.forEach((data) =>
+    stmt.run(
+      data.student_id,
+      data.subject_id,
+      data.term,
+      data.ce_mark,
+      data.te_mark,
+      data.grade
+    )
+  );
+  return { success: true };
+});
+
+// Get student achievements
+ipcMain.handle("get-student-achievements", (event, studentId) => {
+  const stmt = db.prepare("SELECT * FROM achievements WHERE student_id = ?");
+  return stmt.get(studentId) || {};
+});
+
+// Save or Update Achievements
+ipcMain.handle("save-student-achievements", (event, data) => {
+  const stmt = db.prepare(`
+      INSERT INTO achievements (student_id, hobby, special_abilities, achievements, scholarships, additional_notes)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT(student_id) DO UPDATE SET 
+          hobby = excluded.hobby,
+          special_abilities = excluded.special_abilities,
+          achievements = excluded.achievements,
+          scholarships = excluded.scholarships,
+          additional_notes = excluded.additional_notes
+  `);
+
+  stmt.run(
+    data.student_id,
+    data.hobby,
+    data.special_abilities,
+    data.achievements,
+    data.scholarships,
+    data.additional_notes
+  );
+  return { success: true };
+});
+
+// Get student remarks
+ipcMain.handle("get-student-remarks", (event, studentId) => {
+  const stmt = db.prepare(
+    "SELECT subject, remark FROM student_remarks WHERE student_id = ?"
+  );
+  return stmt.all(studentId);
+});
+
+// Save or Update Remarks
+ipcMain.handle("save-student-remarks", (event, remarksData) => {
+  try {
+    const stmt = db.prepare(`
+      INSERT INTO student_remarks (student_id, subject, remark)
+        VALUES (?, ?, ?)
+        ON CONFLICT(student_id, subject) 
+        DO UPDATE SET remark = excluded.remark
+  `);
+
+    const insertTransaction = db.transaction((data) => {
+      data.forEach((row) => stmt.run(row.student_id, row.subject, row.remark));
+    });
+
+    insertTransaction(remarksData);
+    return { success: true, message: "Remarks updated successfully." };
+  } catch (error) {
+    console.log(error);
+    return { success: false, message: error };
   }
 });

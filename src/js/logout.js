@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoutButton) {
     logoutButton.addEventListener("click", () => {
       // Redirect to login page
+      localStorage.removeItem("loggedInUser");
       window.location.href = "../login.html";
     });
   }
