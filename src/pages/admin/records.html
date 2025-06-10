@@ -3,16 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Records</title>
+    <title>GHS PINAVOORKUDY</title>
     <link rel="stylesheet" href="../../css/style.css">
     <script src="../../js/records.js"></script>
     <script src="../../js/logout.js"></script>
 </head>
 <body>
+    <!-- Confirm Box -->
+    <div id="customConfirm" class="confirm-box">
+        <div class="confirm-content">
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="confirm-buttons">
+                <button id="confirmOk">OK</button>
+                <button id="confirmCancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Box -->
+    <div id="customAlert" class="alert-box">
+        <div class="alert-content">
+            <p id="alertMessage">This is a custom alert!</p>
+            <button id="alertClose" onclick="closeAlert()">OK</button>
+        </div>
+    </div>
+
     <header class="main-header">
-        <h1>GOVT.HIGH SCHOOL Pinavoorkudy</h1>
+        <h1>GOVT.HIGH SCHOOL PINAVOORKUDY</h1>
         <span class="menu-icon">&#9776;</span>
-        <button id="logout-btn">Logout</button>
+        <div id="profile" class="profile">
+            <p></p>
+            <button id="logout-btn">Logout</button>
+        </div>
     </header>
     <div class="container">
         <aside class="sidebar">
@@ -23,7 +45,8 @@
                     <li><a href="records.html" id="view-records-menu" class="active">View Records</a></li>
                     <li><a href="academics.html" id="view-records-menu">Academics</a></li>
                     <li><a href="staff.html" id="dashboard-menu">Create User</a></li>
-                    <li><a href="#" id="export-csv">Export CSV</a></li>
+                    <li><a href="backup.html" id="dashboard-menu">Backup</a></li>
+                    <!-- <li><a href="#" id="export-csv">Export CSV</a></li> -->
                 </ul>
             </nav>
         </aside>
@@ -120,7 +143,7 @@
 
             <!-- View all student -->
             <section class="students-table-container" id="studentsTableContainer">
-                <h2>All Students</h2>
+                <h2 id="students-table-heading">All Students</h2>
                 <div class="table-wrapper">
                     <table class="students-table" id="studentsTable">
                         <thead>

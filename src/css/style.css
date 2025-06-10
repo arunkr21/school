@@ -129,6 +129,108 @@ body .container {
     font-size: var(--font-size-md); /* Ensure consistent font size */
 }
 
+/* ************************************** */
+/* Alert Box  */
+/* ************************************** */
+.alert-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Transparent background */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.alert-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 300px;
+}
+
+.alert-content p {
+    margin-bottom: 15px;
+}
+
+.alert-content button {
+    min-width: 100px;
+    padding: 8px 15px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.alert-content button:hover {
+    background: #0056b3;
+}
+
+/* ************************************** */
+/* Confirm Box  */
+/* ************************************** */
+.confirm-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Transparent overlay */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.confirm-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 300px;
+}
+
+.confirm-content p {
+    margin-bottom: 15px;
+}
+
+.confirm-buttons {
+    display: flex;
+    justify-content: space-around;
+}
+
+.confirm-buttons button {
+    min-width: 100px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#confirmOk {
+    background: #007bff;
+    color: white;
+}
+
+#confirmOk:hover {
+    background: #0056b3;
+}
+
+#confirmCancel {
+    background: #dc3545;
+    color: white;
+}
+
+#confirmCancel:hover {
+    background: #c82333;
+}
 
 /* ************************************** */
 /* Login page  */
@@ -192,6 +294,11 @@ body .container {
     font-size: var(--font-size-xl);
     margin-right: auto;
     margin-left: 1rem;
+}
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 #logout-btn {
@@ -529,8 +636,22 @@ body .container {
 /* ************************************** */
 /* Staff page  */
 /* ************************************** */
-.add-user .staff-list{
-    
+.add-user table{
+    margin-top: 20px;
+}
+.add-user .user-table td{
+    padding-right: 30px;
+    padding-bottom: 10px;
+}
+.add-user .staff-list tr{
+    border-bottom: 1px solid #333;
+}
+.add-user .staff-list th{
+    text-align: left;
+}
+.add-user .staff-list td{
+    width: 150px;
+    margin-right: 20px;
 }
 
 /* ************************************** */
@@ -802,4 +923,56 @@ body .container {
 .records .students-table td {
     padding: 0.8rem;
     border-bottom: 1px solid var(--border-color);
+}
+
+/* ************************************** */
+/* Export CSV */
+/* ************************************** */
+.export-csv .card {
+    margin-top: 20px;
+}
+
+.export-csv .tool-button {
+    background-color: #4ea7e8;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.export-csv .tool-button:hover {
+    background-color: #3498db;
+}
+
+.export-csv .file-input {
+    display: none;
+}
+
+.export-csv .file-label {
+    display: inline-block;
+    background-color: #4ea7e8;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.export-csv .file-label:hover {
+    background-color: #3498db;
+}
+
+/* ************************************** */
+/* Backup*/
+/* ************************************** */
+.backup table td {
+    padding-right: 20px;
+    padding-bottom: 10px;
+}
+.backup table button {
+    min-width: 90px;
 }

@@ -4,6 +4,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveBtn = document.getElementById("btn-save");
   const searchBtn = document.getElementById("searchStudentBtn");
 
+  // User Info
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  const userRole = loggedInUser.role;
+  const userClass = loggedInUser.class;
+
+  // Alert Box
+  const alertClose = document.getElementById("alertClose");
+  function showAlert(message) {
+    document.getElementById("alertMessage").innerText = message;
+    document.getElementById("customAlert").style.display = "flex";
+  }
+  alertClose.addEventListener("click", () => {
+    document.getElementById("customAlert").style.display = "none";
+  });
+
+  const profileField = document.querySelector("#profile p");
+  const profileName = JSON.parse(localStorage.getItem("loggedInUser")).username;
+  profileField.textContent = profileName;
+
+  document.getElementById("class").value = userClass;
   // Handle Search Button Click
   if (searchBtn) {
     searchBtn.addEventListener("click", async () => {
@@ -11,13 +31,22 @@ document.addEventListener("DOMContentLoaded", () => {
         .getElementById("searchAdmissionNo")
         .value.trim();
       if (!admissionNo) {
-        alert("Enter admission number");
+        showAlert("Enter amission number");
         return;
       }
 
       const result = await window.electronAPI.searchStudent(admissionNo);
 
       if (result.success) {
+        if (userRole === "staff") {
+          if (result.data.class !== userClass) {
+            showAlert(
+              `You are only allowed to manage students from Class ${userClass}.`
+            );
+            return;
+          }
+        }
+
         const student = result.data;
         const familyMembers = result.family;
 
@@ -90,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ).value = member.occupation;
         });
       } else {
-        alert("Student not found! Enter details to add a new student.");
+        showAlert("Student not found!");
         studentForm.reset();
         document.getElementById("admissionNo").value = admissionNo; // Keep the entered admission number
       }
@@ -102,7 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
     saveBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       const studentData = {};
-
       // Get all input fields dynamically
       document.querySelectorAll("select, input").forEach((input) => {
         studentData[input.id.replace("-", "_")] = input.value.trim(); // Convert "admission-no" → "admission_no"
@@ -141,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
         studentData,
         familyMembers
       );
-      alert(response.message);
+      showAlert(response.message);
 
       if (response.success) {
         document.querySelector("form").reset(); // Reset form after successful save

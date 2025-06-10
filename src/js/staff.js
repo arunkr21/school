@@ -2,6 +2,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const addStaffBtn = document.getElementById("addStaffBtn");
   const staffList = document.getElementById("staffList");
 
+  const profileField = document.querySelector("#profile p");
+  const profileName = JSON.parse(localStorage.getItem("loggedInUser")).username;
+  profileField.textContent = profileName;
+
+  // Alert Box
+  const alertClose = document.getElementById("alertClose");
+  function showAlert(message) {
+    document.getElementById("alertMessage").innerText = message;
+    document.getElementById("customAlert").style.display = "flex";
+  }
+  alertClose.addEventListener("click", () => {
+    document.getElementById("customAlert").style.display = "none";
+  });
+
+  // Confirm Box
+  function showConfirm(message, callback) {
+    document.getElementById("confirmMessage").innerText = message;
+    document.getElementById("customConfirm").style.display = "flex";
+
+    // Handle OK Click
+    document.getElementById("confirmOk").onclick = function () {
+      document.getElementById("customConfirm").style.display = "none";
+      callback(true); // Return true when OK is clicked
+    };
+
+    // Handle Cancel Click
+    document.getElementById("confirmCancel").onclick = function () {
+      document.getElementById("customConfirm").style.display = "none";
+      callback(false); // Return false when Cancel is clicked
+    };
+  }
+
   // Load staff list on page load
   async function loadStaffList() {
     const staffUsers = await window.electronAPI.getAllStaff();
@@ -21,11 +53,24 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".deleteStaffBtn").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const username = btn.getAttribute("data-username");
-        if (confirm(`Are you sure you want to delete ${username}?`)) {
-          const result = await window.electronAPI.deleteStaff(username);
-          alert(result.message);
-          loadStaffList(); // Refresh staff list
-        }
+        // if (confirm(`Are you sure you want to delete ${username}?`)) {
+        //   const result = await window.electronAPI.deleteStaff(username);
+        //   alert(result.message);
+        //   loadStaffList(); // Refresh staff list
+        // }
+
+        showConfirm(
+          `Are you sure you want ${username}?`,
+          async function (confirmed) {
+            if (confirmed) {
+              const result = await window.electronAPI.deleteStaff(username);
+              showAlert(result.message);
+              loadStaffList(); // Refresh staff list
+            } else {
+              return;
+            }
+          }
+        );
       });
     });
   }
@@ -37,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const assignedClass = document.getElementById("staffClass").value.trim();
 
     if (!username || !password || !assignedClass) {
-      alert("Please fill all fields.");
+      showAlert("Please fill all fields.");
       return;
     }
 
@@ -46,9 +91,14 @@ document.addEventListener("DOMContentLoaded", () => {
       password,
       assignedClass,
     });
-    alert(result.message);
+    showAlert(result.message);
+    document.getElementById("staffUsername").value = "";
+    document.getElementById("staffPassword").value = "";
+    document.getElementById("staffClass").value = "";
     loadStaffList(); // Refresh staff list
   });
 
   loadStaffList(); // Load staff on page load
+
+  function clearField() {}
 });

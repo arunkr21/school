@@ -26,4 +26,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("get-student-remarks", studentId),
   saveStudentRemarks: (remarksData) =>
     ipcRenderer.invoke("save-student-remarks", remarksData),
+  exportDatabase: () => ipcRenderer.invoke("export-database"),
+  importDatabase: () => ipcRenderer.invoke("import-database"),
 });

@@ -3,6 +3,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const studentsTable = document.getElementById("studentsTable");
   const studentsTableBody = document.querySelector("#studentsTable tbody");
 
+  // User Info
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  const userRole = loggedInUser.role;
+  const userClass = loggedInUser.class;
+
+  const profileField = document.querySelector("#profile p");
+  const profileName = JSON.parse(localStorage.getItem("loggedInUser")).username;
+  profileField.textContent = profileName;
+
+  // Alert Box
+  const alertClose = document.getElementById("alertClose");
+  function showAlert(message) {
+    document.getElementById("alertMessage").innerText = message;
+    document.getElementById("customAlert").style.display = "flex";
+  }
+  alertClose.addEventListener("click", () => {
+    document.getElementById("customAlert").style.display = "none";
+  });
+
   // Handle Search Button Click
   if (searchBtn) {
     searchBtn.addEventListener("click", async () => {
@@ -10,13 +29,22 @@ document.addEventListener("DOMContentLoaded", () => {
         .getElementById("searchAdmissionNo")
         .value.trim();
       if (!admissionNo) {
-        alert("Enter admission number");
+        showAlert("Enter admission number");
         return;
       }
 
       const result = await window.electronAPI.searchStudent(admissionNo);
 
       if (result.success) {
+        if (userRole === "staff") {
+          if (result.data.class !== userClass) {
+            showAlert(
+              `You are only allowed to manage students from Class ${userClass}.`
+            );
+            return;
+          }
+        }
+
         // Display student data
         const studentDataSection = document.querySelector(
           ".student-data-section"
@@ -97,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           `;
       } else {
-        alert("Student not found! Enter details to add a new student.");
+        showAlert("Student not found! Enter details to add a new student.");
       }
     });
   }
@@ -107,13 +135,21 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const result = await window.electronAPI.getAllStudents();
       if (result.success) {
+        if (userRole === "staff") {
+          document.getElementById(
+            "students-table-heading"
+          ).textContent = `Students of Class ${userClass}`;
+        } else {
+          document.getElementById("students-table-heading").textContent =
+            "All Students";
+        }
         populateStudentsTable(result.data);
       } else {
-        alert(result.message);
+        showAlert(result.message);
       }
     } catch (error) {
       console.error("Error loading students:", error);
-      alert("Failed to load students. Please try again.");
+      showAlert("Failed to load students. Please try again.");
     }
   }
 
@@ -121,8 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function populateStudentsTable(students) {
     studentsTableBody.innerHTML = ""; // Clear existing table data
     students.forEach((student) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
+      if (userRole === "admin" || student.class === userClass) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
         <td>${student.admission_no}</td>
         <td>${student.name}</td>
         <td>${student.address}</td>
@@ -159,7 +196,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${student.special_diseases}</td>
         <td>${student.vaccination_details}</td>
       `;
-      studentsTableBody.appendChild(row);
+        studentsTableBody.appendChild(row);
+      }
     });
   }
 

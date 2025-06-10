@@ -117,15 +117,23 @@ function initDatabase() {
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS student_remarks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    student_id INTEGER,
-    subject TEXT,
-    remark TEXT,
-    UNIQUE(student_id, subject),
-    FOREIGN KEY (student_id) REFERENCES students(admission_no)
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        student_id INTEGER NOT NULL,
+        subject_id INTEGER NOT NULL,
+        remark TEXT,
+        UNIQUE(student_id, subject_id),  -- Ensures one remark per student per subject
+        FOREIGN KEY (student_id) REFERENCES students(admission_no),
+        FOREIGN KEY (subject_id) REFERENCES subjects(id)
   )
   `
   ).run();
+  // CREATE TABLE IF NOT EXISTS student_remarks (
+  //   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  //   student_id INTEGER,
+  //   subject TEXT,
+  //   remark TEXT,
+  //   UNIQUE(student_id, subject),
+  //   FOREIGN KEY (student_id) REFERENCES students(admission_no)
 
   // Subjects table
   db.prepare(
@@ -162,60 +170,80 @@ function initDatabase() {
     `
     INSERT OR IGNORE INTO subjects (name, standard) VALUES
 
+      ('Integration 1', 1),
+      ('Integration 2', 1),
+      ('Integration 3', 1),
       ('English', 1),
-      ('Mathematics', 1),
-      ('Environmental Science', 1),
-      ('Regional Language', 1),
 
+      ('Integration 1', 2),
+      ('Integration 2', 2),
+      ('Integration 3', 2),
       ('English', 2),
-      ('Mathematics', 2),
-      ('Environmental Science', 2),
-      ('Regional Language', 2),
 
+      ('Malayalam', 3),
       ('English', 3),
+      ('EVS', 3),
       ('Mathematics', 3),
-      ('Environmental Science', 3),
-      ('Regional Language', 3),
 
+      ('Malayalam', 4),
       ('English', 4),
+      ('EVS', 4),
       ('Mathematics', 4),
-      ('Environmental Science', 4),
-      ('Regional Language', 4),
 
+      ('Malayalam', 5),
       ('English', 5),
+      ('Hindi', 5),
+      ('Basic Science', 5),
+      ('Social Science', 5),
       ('Mathematics', 5),
-      ('Environmental Science', 5),
-      ('Regional Language', 5),
+      ('Art', 5),
 
+      ('Malayalam', 6),
       ('English', 6),
-      ('Mathematics', 6),
-      ('Science', 6),
+      ('Hindi', 6),
+      ('Basic Science', 6),
       ('Social Science', 6),
-      ('Regional Language', 6),
+      ('Mathematics', 6),
+      ('Art', 6),
 
+      ('Malayalam', 7),
       ('English', 7),
-      ('Mathematics', 7),
-      ('Science', 7),
+      ('Hindi', 7),
+      ('Basic Science', 7),
       ('Social Science', 7),
-      ('Regional Language', 7),
+      ('Mathematics', 7),
+      ('Art', 7),
 
+      ('Malayalam', 8),
       ('English', 8),
-      ('Mathematics', 8),
-      ('Science', 8),
+      ('Hindi', 8),
+      ('Basic Science', 8),
       ('Social Science', 8),
-      ('Regional Language', 8),
+      ('Mathematics', 8),
+      ('Art', 8),
 
+      ('Malayalam 1', 9),
+      ('Malayalam 2', 9),
       ('English', 9),
-      ('Mathematics', 9),
-      ('Science', 9),
+      ('Hindi', 9),
+      ('Physics', 9),
+      ('Chemistry', 9),
+      ('Biology', 9),
       ('Social Science', 9),
-      ('Regional Language', 9),
+      ('Mathematics', 9),
+      ('Art', 9),
 
+      ('Malayalam 1', 10),
+      ('Malayalam 2', 10),
       ('English', 10),
-      ('Mathematics', 10),
-      ('Science', 10),
+      ('Hindi', 10),
+      ('Physics', 10),
+      ('Chemistry', 10),
+
+      ('Biology', 10),
       ('Social Science', 10),
-      ('Regional Language', 10);
+      ('Mathematics', 10),
+      ('IT', 10)
     `
   ).run();
 
@@ -274,6 +302,7 @@ async function authenticateUser(username, password) {
       username: user.username,
       name: user.name,
       role: user.role,
+      class: user.assigned_class,
     },
   };
 }

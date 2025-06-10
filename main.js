@@ -1,7 +1,9 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require("electron");
 const path = require("path");
+const fs = require("fs");
 const bcrypt = require("bcrypt");
 const Database = require("./database.js");
+const DB_PATH = path.join(__dirname, "database.db");
 
 const sqlite3 = require("better-sqlite3");
 const db = new sqlite3("database.db", { verbose: console.log });
@@ -12,6 +14,7 @@ function createWindow() {
     // fullscreen: true,
     width: 800,
     height: 600,
+    // icon: path.join(__dirname, "src/assets/logo.png"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
@@ -19,13 +22,12 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile(
-    path.join(__dirname, "src", "pages", "admin", "students.html")
-  );
+  mainWindow.loadFile(path.join(__dirname, "src", "pages", "login.html"));
+  Menu.setApplicationMenu(null);
 
-  mainWindow.webContents.once("did-finish-load", () => {
-    mainWindow.webContents.setZoomFactor(0.9); // 90% zoom
-  });
+  // mainWindow.webContents.once("did-finish-load", () => {
+  //   mainWindow.webContents.setZoomFactor(0.9); // 90% zoom
+  // });
 }
 
 app.whenReady().then(() => {
@@ -357,7 +359,12 @@ ipcMain.handle("save-student-achievements", (event, data) => {
 // Get student remarks
 ipcMain.handle("get-student-remarks", (event, studentId) => {
   const stmt = db.prepare(
-    "SELECT subject, remark FROM student_remarks WHERE student_id = ?"
+    `
+        SELECT s.name AS subject, r.remark 
+        FROM student_remarks r
+        JOIN subjects s ON r.subject_id = s.id
+        WHERE r.student_id = ?
+    `
   );
   return stmt.all(studentId);
 });
@@ -365,15 +372,18 @@ ipcMain.handle("get-student-remarks", (event, studentId) => {
 // Save or Update Remarks
 ipcMain.handle("save-student-remarks", (event, remarksData) => {
   try {
+    console.log(remarksData);
     const stmt = db.prepare(`
-      INSERT INTO student_remarks (student_id, subject, remark)
+      INSERT INTO student_remarks (student_id, subject_id, remark)
         VALUES (?, ?, ?)
-        ON CONFLICT(student_id, subject) 
+        ON CONFLICT(student_id, subject_id) 
         DO UPDATE SET remark = excluded.remark
   `);
 
     const insertTransaction = db.transaction((data) => {
-      data.forEach((row) => stmt.run(row.student_id, row.subject, row.remark));
+      data.forEach((row) =>
+        stmt.run(row.student_id, row.subject_id, row.remark)
+      );
     });
 
     insertTransaction(remarksData);
@@ -381,5 +391,61 @@ ipcMain.handle("save-student-remarks", (event, remarksData) => {
   } catch (error) {
     console.log(error);
     return { success: false, message: error };
+  }
+});
+
+// Export Database
+ipcMain.handle("export-database", async () => {
+  try {
+    // Ask user for save location
+    const { filePath } = await dialog.showSaveDialog({
+      title: "Save Database Backup",
+      defaultPath: path.join(app.getPath("desktop"), "database.db"),
+      buttonLabel: "Export",
+      filters: [{ name: "SQLite Database", extensions: ["sqlite", "db"] }],
+    });
+
+    if (!filePath) {
+      return { success: false, message: "Export canceled." };
+    }
+
+    // Copy database file to selected location
+    const sourcePath = path.join(__dirname, "database.db"); // Update if your DB is elsewhere
+    fs.copyFileSync(sourcePath, filePath);
+
+    return { success: true, message: "Database exported successfully!" };
+  } catch (error) {
+    console.error("Database Export Error:", error);
+    return { success: false, message: error.message };
+  }
+});
+
+// Import Database
+ipcMain.handle("import-database", async () => {
+  try {
+    const { filePaths } = await dialog.showOpenDialog({
+      title: "Select Database File to Import",
+      buttonLabel: "Import",
+      filters: [{ name: "SQLite Database", extensions: ["sqlite", "db"] }],
+      properties: ["openFile"],
+    });
+
+    if (!filePaths || filePaths.length === 0) {
+      return { success: false, message: "Import canceled." };
+    }
+
+    const selectedFile = filePaths[0];
+
+    // Replace the existing database with the selected file
+    fs.copyFileSync(selectedFile, DB_PATH);
+
+    return {
+      success: true,
+      message:
+        "Database imported successfully! Restart the app to apply changes.",
+    };
+  } catch (error) {
+    console.error("Database Import Error:", error);
+    return { success: false, message: error.message };
   }
 });

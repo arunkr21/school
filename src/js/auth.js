@@ -13,11 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (username && password) {
           const result = await window.electronAPI.login(username, password);
           if (result.success === true) {
+            localStorage.setItem("loggedInUser", JSON.stringify(result.user));
             if (result.user.role === "admin") {
               window.location.href = "../pages/admin/students.html";
             } else {
-              localStorage.setItem("loggedInUser", JSON.stringify(result.user));
-              window.location.href = "../pages/staff/records.html";
+              window.location.href = "../pages/staff/students.html";
             }
           } else {
             errorMessage.textContent = result.message;

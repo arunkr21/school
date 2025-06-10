@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GHS PINAVOORKUDY</title>
     <link rel="stylesheet" href="../../css/style.css">
-    <script defer src="../../js/staff.js"></script>
+    <script defer src="../../js/backup.js"></script>
     <script src="../../js/logout.js"></script>
+
 </head>
 <body>
     <!-- Confirm Box -->
@@ -45,51 +46,42 @@
                     <li><a href="students.html" id="add-student-menu">Add Student</a></li>
                     <li><a href="records.html" id="view-records-menu">View Records</a></li>
                     <li><a href="academics.html" id="view-records-menu" >Academics</a></li>
-                    <li><a href="staff.html" id="dashboard-menu" class="active">Create User</a></li>
-                    <li><a href="backup.html" id="dashboard-menu">Backup</a></li>
-                    <!-- <li><a href="#" id="export-csv">Export CSV</a></li> -->
+                    <li><a href="staff.html" id="dashboard-menu">Create User</a></li>
+                    <li><a href="backup.html" id="export-csv" class="active">Backup</a></li>
                     <!-- <li><a href="#" id="toggle-dark-mode">Dark Mode</a></li> -->
                 </ul>
             </nav>
         </aside>
-        <main class="content add-user">
-            <h2>Staff Management</h2>
+
+        <main class="content backup">
+            <div class="content-header">
+                <h1>BACKUP DATABASE</h1>
+            </div>
             <section>
-                
-            <!-- Add Staff User Form -->
-            <h3 class="title">Add New Staff</h3>
-                <table class="user-table">
+                <table>
                     <tr>
-                        <td><label for="staffUsername">Username:</label></td>
-                        <td><input type="text" id="staffUsername" required><br></td>
+                        <td>
+                            <label style="font-weight: 600;">Export database:  </label>
+                        </td>
+                        <td>
+                            <button id="exportDB" class="tool-button">
+                                Export
+                            </button>
+                        </td>
                     </tr>
                     <tr>
-                        <td><label for="staffPassword">Password:</label></td>
-                        <td><input type="password" id="staffPassword" required><br></td>
-                    </tr>
-                    <tr>
-                        <td><label for="staffClass">Assigned Class:</label></td>
-                        <td><input type="text" id="staffClass" required><br></td>
+                        <td>
+                            <label style="font-weight: 600;">Import database:  </label>
+                        </td>
+                        <td>
+                            <button id="importDB" class="tool-button">
+                                Import
+                            </button>
+                        </td>
                     </tr>
                 </table>
-
-            <button id="addStaffBtn">Add Staff</button>
-        
             </section>
         
-            <section>
-                <!-- List of Staff Users -->
-            <h3 class="title">Staff List</h3>
-            <table class="staff-list">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Class</th>
-                    </tr>
-                </thead>
-                <tbody id="staffList"></tbody>
-            </table>
-            </section>
         </main>
     </div>
 </body>
