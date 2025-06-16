@@ -40,17 +40,16 @@ function promoteEligibleStudents(db) {
         SELECT id FROM users WHERE role = 'staff' AND assigned_class = ?
       `).get(nextClass);
 
-      if (newTeacher) {
-        console.log(`📘 Student ${admissionNo} is now under teacher ID ${newTeacher.id}`);
+    if (newTeacher) {
+  console.log(`📘 Student ${admissionNo} is now under teacher ID ${newTeacher.id}`);
 
-        // OPTIONAL: insert or update into student_teacher_map (uncomment if table exists)
-        /*
-        db.prepare(`
-          INSERT OR REPLACE INTO student_teacher_map (student_id, teacher_id, academic_year)
-          VALUES (?, ?, ?)
-        `).run(admissionNo, newTeacher.id, '2024–25');
-        */
-      }
+  // Update student-teacher mapping for the academic year
+  db.prepare(`
+    INSERT OR REPLACE INTO student_teacher_map (student_id, teacher_id, academic_year)
+    VALUES (?, ?, ?)
+  `).run(admissionNo, newTeacher.id, '2024–25'); // You can later replace this with dynamic year
+}
+
 
     } else if (currentClass === 10) {
       // Mark student as passed out
