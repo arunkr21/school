@@ -7,6 +7,8 @@ const DB_PATH = path.join(__dirname, "database.db");
 
 const sqlite3 = require("better-sqlite3");
 const db = new sqlite3("database.db", { verbose: console.log });
+const { promoteEligibleStudents } = require("./promoteStudents");
+
 
 let mainWindow;
 function createWindow() {
@@ -32,8 +34,10 @@ function createWindow() {
 
 app.whenReady().then(() => {
   Database.initDatabase();
+  promoteEligibleStudents(db); // 🎓 Promote eligible students!
   createWindow();
 });
+
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
